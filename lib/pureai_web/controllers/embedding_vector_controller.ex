@@ -45,4 +45,13 @@ defmodule PureAIWeb.EmbeddingVectorController do
     {:ok, res} = Pureai.OpenaiEmbedding.text_to_vetor(text)
     render(conn, :show, embedding_vector: res)
   end
+
+  def text_to_vector_simple_auth(conn, %{"text" => text, "key" => key}) do
+    if key == Application.get_env(:openai, :admin_key) do
+      {:ok, res} = Pureai.OpenaiEmbedding.text_to_vetor(text)
+      render(conn, :show, embedding_vector: res)
+    else
+      json(conn, %{error: "Invalid key"})
+    end
+  end
 end

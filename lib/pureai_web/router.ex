@@ -34,8 +34,11 @@ defmodule PureAIWeb.Router do
     post "/embedding", EmbeddingVectorController, :text_to_vector
     # with valid topic_id
     resources "/messages", MessageController, only: [:create, :show]
+  end
 
-
+  scope "/api/simple_ath", PureAIWeb do
+    pipe_through [:api]
+    post "/embedding", EmbeddingVectorController, :text_to_vector_simple_auth
   end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
