@@ -24,24 +24,31 @@ defmodule Pureai.OpenaiEmbedding do
   def text_to_vetor(client, prompt) do
     sha = hash_text(prompt)
 
-    case PureAI.Context.get_embedding_vector_by_sha(sha) do
-      nil ->
-        ai_type = ai_type()
-        mp = %{:input => prompt, :model => "text-embedding-ada-002"}
-        {:ok, %Tesla.Env{status: status, body: %{"data" => [%{"embedding" => vectors}]}}} = do_text_to_vector(client, mp, :openai)
-        Tesla.post(client, "/v1/embeddings", mp)
-
-        case status do
-          200 ->
-            PureAI.Context.create_embedding_vector(%{sha: sha, text: prompt, vector: Jason.encode!(vectors)})
-
-          _ ->
-            {:error, status}
-        end
-
-      %{vector: _} = res ->
-        {:ok, res}
+    try do
+      case PureAI.Context.get_embedding_vector_by_sha(sha) do
+        nil ->
+          ai_type = ai_type()
+          mp = %{:input => prompt, :model => "text-embedding-ada-002"}
+          {:ok, %Tesla.Env{status: status, body: %{"data" => [%{"embedding" => vectors}]}}} = do_text_to_vector(client, mp, :openai)
+          Tesla.post(client, "/v1/embeddings", mp)
+  
+          case status do
+            200 ->
+              PureAI.Context.create_embedding_vector(%{sha: sha, text: prompt, vector: Jason.encode!(vectors)})
+  
+            _ ->
+              {:error, status}
+          end
+  
+        %{vector: _} = res ->
+          {:ok, res}
+      end
+    rescue
+      error ->
+        {:error, inspect(error)}
     end
+
+    
   end
 
   def do_text_to_vector(client, mp, :openai) do
