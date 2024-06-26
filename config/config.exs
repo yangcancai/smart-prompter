@@ -61,12 +61,12 @@ config :phoenix, :json_library, Jason
 
 config :openai,
   api_url: System.get_env("OPENAI_URL"),
-  api_type: :azure,
-  azure_deployment_id: System.get_env("AZURE_DEPLOYMENT_ID"),
-  azure_api_version: System.get_env("AZURE_API_VERSION"),
-  azure_subscription_key: System.get_env("AZURE_SUBSCRIPTION_KEY"),
-  api_key: System.get_env("OPENAI_KEY"), 
-  admin_key: System.get_env("ADMIN_KEY"), 
+  api_key: System.get_env("OPENAI_KEY"),
+  azure_openai_endpoint: System.get_env("AZURE_OPENAI_ENDPOINT"),
+  azure_openai_api_key: System.get_env("AZURE_OPENAI_API_KEY"),
+  azure_openai_api_version: System.get_env("AZURE_OPENAI_API_VERSION"),
+  azure_openai_embeddings_deployment: System.get_env("AZURE_OPENAI_EMBEDDINGS_DEPLOYMENT"),
+  admin_key: System.get_env("ADMIN_KEY"),
   # client: PureAI.OpenAIMock,
   client: OpenAI,
   http_options: [recv_timeout: 60_000]

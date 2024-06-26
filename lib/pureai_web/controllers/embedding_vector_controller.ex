@@ -42,18 +42,29 @@ defmodule PureAIWeb.EmbeddingVectorController do
   end
 
   def text_to_vector(conn, %{"text" => text}) do
-    {:ok, res} = Pureai.OpenaiEmbedding.text_to_vetor(text)
+    hook = get_hook(conn)
+    {:ok, res} = hook.text_to_vetor(text)
     render(conn, :show, embedding_vector: res)
   end
 
   def text_to_vector_simple_auth(conn, %{"text" => text, "key" => key}) do
     if key == Application.get_env(:openai, :admin_key) do
-      case Pureai.OpenaiEmbedding.text_to_vetor(text) do
+      hook = get_hook(conn)
+      case hook.text_to_vetor(text) do
         {:error, error} -> json(conn, %{error: error})
         {:ok, res} -> render(conn, :show, embedding_vector: res)
       end
     else
       json(conn, %{error: "Invalid key"})
     end
+  end
+  def get_hook(conn) when is_map(conn) do
+    conn.query_params["type"] |> get_hook()
+  end
+  def get_hook("azure") do
+      Pureai.AzureEmbedding
+  end
+  def get_hook(_) do
+     Pureai.OpenaiEmbedding
   end
 end
